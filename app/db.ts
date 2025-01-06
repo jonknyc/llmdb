@@ -94,19 +94,33 @@ export async function runQuery(query: string) {
 
   await client.connect()
   try {
-    const result = await client.query(query)
-    // Convert results to CSV format
-    if (result.rows.length === 0) {
+    // Start transaction
+    await client.query('BEGIN')
+
+    // Split the query into individual statements and filter out empty ones
+    const statements = query.split(';').filter((stmt) => stmt.trim())
+    let lastResult
+
+    // Execute each statement sequentially
+    for (const stmt of statements) {
+      lastResult = await client.query(stmt)
+    }
+
+    // Commit the transaction
+    await client.query('COMMIT')
+
+    // Use the last result for output
+    if (!lastResult || lastResult.rows.length === 0) {
       return 'ok'
     }
 
     return [
-      // Header row using column names from the result
-      result.fields.map((field) => field.name).join(','),
-      // Data rows
-      ...result.rows.map((row) => Object.values(row).join(',')),
+      lastResult.fields.map((field) => field.name).join(','),
+      ...lastResult.rows.map((row) => Object.values(row).join(',')),
     ].join('\n')
   } catch (error) {
+    // Rollback the transaction on error
+    await client.query('ROLLBACK')
     if (error instanceof Error) {
       return error.message
     }

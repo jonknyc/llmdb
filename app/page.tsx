@@ -9,9 +9,9 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { getSchema, runQuery } from './db'
-import { generateSQLQuery } from './llm'
+import { generateErDiagram, generateSqlQuery } from './llm'
 
 export default function Home() {
   const [messages, setMessages] = useState<
@@ -19,6 +19,17 @@ export default function Home() {
   >([])
   const [input, setInput] = useState('')
   const [isTyping, setIsTyping] = useState(false)
+  const [erDiagram, setErDiagram] = useState<string | null>(null)
+
+  const updateErDiagram = async () => {
+    const schemaInfo = await getSchema()
+    const erDiagram = await generateErDiagram({ schemaInfo })
+    setErDiagram(erDiagram)
+  }
+
+  useEffect(() => {
+    updateErDiagram()
+  }, [])
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -26,7 +37,7 @@ export default function Home() {
     setInput('')
     setIsTyping(true)
     const schemaInfo = await getSchema()
-    const response = await generateSQLQuery({
+    const response = await generateSqlQuery({
       queryDescription: input,
       schemaInfo,
     })
@@ -51,13 +62,22 @@ export default function Home() {
       }
     }
     setIsTyping(false)
+    updateErDiagram()
   }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <Card className="w-full max-w-2xl">
         <CardHeader>
-          <CardTitle>Chat with AI</CardTitle>
+          <CardTitle>Database Schema</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <pre>{erDiagram}</pre>
+        </CardContent>
+      </Card>
+      <Card className="w-full max-w-2xl">
+        <CardHeader>
+          <CardTitle>Chat with the database</CardTitle>
         </CardHeader>
         <CardContent className="h-[60vh] overflow-y-auto">
           {messages.map((m, index) => (
