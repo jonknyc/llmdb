@@ -1,4 +1,20 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# LLMDB
+
+LLMDB is a natural language interface for PostgreSQL databases, allowing users to interact with their data through conversational prompts. This project bridges the gap between complex SQL queries and natural language, making database interactions more intuitive and accessible.
+
+## Description
+
+LLMDB transforms how users interact with PostgreSQL databases by providing a chat-based interface that converts natural language questions into SQL queries. Whether you're a database expert or new to SQL, LLMDB helps you explore and manipulate your data through simple conversations.
+
+Key Features:
+
+- 🤖 Natural language to SQL conversion
+- 💬 Interactive chat interface
+- 🗃️ PostgreSQL database integration
+- 📊 Query result visualization
+- 🔒 Secure database connections
+
+> ⚠️ **Note:** This project is currently in development.
 
 ## Getting Started
 
