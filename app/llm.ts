@@ -57,7 +57,7 @@ export async function getMermaidErDiagramInput({
   try {
     const systemPrompt = `You are an ER diagram generator. Your task is to create a Mermaid.js entity-relationship diagram based on the provided database schema.
 IMPORTANT: Respond ONLY with the Mermaid.js diagram definition, without any explanations, markdown, or code blocks.
-Use the 'erDiagram' syntax and include all relationships with proper cardinality (||--o|, ||--|{, etc.).
+Use the 'erDiagram' syntax and include all relationships with proper cardinality (||--o|, ||--|{, etc.).  Only include relationships that are present in the schema.
 
 Example format:
 erDiagram
