@@ -57,7 +57,7 @@ export async function getSchema() {
 
   await client.end()
 
-  return {
+  const schemaInfo = {
     tablesAndColumns: [
       [
         'table_name',
@@ -85,6 +85,11 @@ export async function getSchema() {
       ...foreignKeyReferences.rows.map((row) => Object.values(row).join(',')),
     ].join('\n'),
   }
+
+  console.log('\nSchema info:')
+  console.log(schemaInfo)
+
+  return schemaInfo
 }
 
 export async function runQuery(query: string) {

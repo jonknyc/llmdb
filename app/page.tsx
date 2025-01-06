@@ -10,8 +10,10 @@ import {
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { getSchema, runQuery } from './db'
-import { generateErDiagram, generateSqlQuery } from './llm'
+import { generateSqlQuery, getMermaidErDiagramInput } from './llm'
+import { generateErDiagram } from './mermaid'
 
 export default function Home() {
   const [messages, setMessages] = useState<
@@ -22,9 +24,18 @@ export default function Home() {
   const [erDiagram, setErDiagram] = useState<string | null>(null)
 
   const updateErDiagram = async () => {
-    const schemaInfo = await getSchema()
-    const erDiagram = await generateErDiagram({ schemaInfo })
-    setErDiagram(erDiagram)
+    try {
+      const schemaInfo = await getSchema()
+      const erDiagramInput = await getMermaidErDiagramInput({ schemaInfo })
+      if (erDiagramInput) {
+        const erDiagram = await generateErDiagram(erDiagramInput)
+        setErDiagram(erDiagram)
+      }
+    } catch (error) {
+      toast.error('Error updating ER diagram', {
+        description: error instanceof Error ? error.message : 'Unknown error',
+      })
+    }
   }
 
   useEffect(() => {
@@ -72,7 +83,12 @@ export default function Home() {
           <CardTitle>Database Schema</CardTitle>
         </CardHeader>
         <CardContent>
-          <pre>{erDiagram}</pre>
+          {erDiagram && (
+            <div
+              className="w-full"
+              dangerouslySetInnerHTML={{ __html: erDiagram }}
+            />
+          )}
         </CardContent>
       </Card>
       <Card className="w-full max-w-2xl">
